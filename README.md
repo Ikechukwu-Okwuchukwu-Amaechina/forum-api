@@ -1,42 +1,59 @@
 # Forum API
 
-A simple, extensible RESTful API backend scaffold for a forum application. This project is intended as a starting point to build endpoints for threads, posts, users, and authentication.
+A clean, extensible Node.js scaffold for building a RESTful forum backend. Use it to implement endpoints for threads, posts, users, and authentication.
 
 ## Features
 
-- Node.js project setup ready for API development
-- Clear project structure suggestion (src/, routes/, controllers/)
-- Environment variables via `.env`
-- Git-ignore for common Node artifacts
-- Placeholder test script
+- Modular folder structure for clarity and scale
+- Environment configuration via `.env` (ignored by Git)
+- Ready for routing, controllers, middleware, and models
+- Node-friendly `.gitignore`
+
+## Project structure
+
+- `config/` — app and environment configuration (e.g., database, app settings)
+- `controllers/` — request handlers (business logic)
+- `middleware/` — reusable request/response middleware
+- `models/` — data models or schema definitions
+- `routes/` — route definitions that map to controllers
+
+You can keep your server entry point at `index.js` (per `package.json` main), and wire routes from `routes/`.
 
 ## Installation
 
 1. Clone the repository
 2. Install dependencies
 
-```bash
+```powershell
 npm install
 ```
 
-3. Create a `.env` file at the project root for your environment variables.
+3. Create a `.env` file at the project root. Example variables:
+
+```env
+PORT=3000
+# DATABASE_URL=
+# JWT_SECRET=
+```
 
 ## Usage
 
-Start implementing your API under `src/` (e.g., `src/index.js`). Update `package.json` scripts as you go, for example:
+1. Create an `index.js` at the project root (or update `main` in `package.json` to your preferred entry file).
+2. Export your routes from `routes/` and mount them in the server entry.
+3. Add helpful scripts to `package.json` (optional):
 
 ```json
 {
   "scripts": {
-    "dev": "node src/index.js",
-    "start": "node src/index.js"
+    "dev": "node index.js",
+    "start": "node index.js"
   }
 }
 ```
 
 Run the app:
 
-```bash
+```powershell
 npm run dev
 ```
 
