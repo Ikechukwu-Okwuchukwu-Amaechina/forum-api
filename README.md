@@ -1,67 +1,124 @@
 # Forum API
 
-A clean, extensible Node.js scaffold for building a RESTful forum backend. Use it to implement endpoints for threads, posts, users, and authentication.
+Simple forum backend with threads, nested comments, votes, and admin moderation.
 
 ## Features
 
-- Modular folder structure for clarity and scale
-- Environment configuration via `.env` (ignored by Git)
-- Ready for routing, controllers, middleware, and models
-- Node-friendly `.gitignore`
+- Auth (signup/login with JWT)
+- Threads CRUD (create, list, get, admin delete)
+- Nested comments (reply)
+- Voting on threads and comments (up/down, no double-vote)
+- Admin moderation (list all threads, delete any comment)
 
 ## Project structure
 
-- `config/` — app and environment configuration (e.g., database, app settings)
-- `controllers/` — request handlers (business logic)
-- `middleware/` — reusable request/response middleware
-- `models/` — data models or schema definitions
-- `routes/` — route definitions that map to controllers
+- `config/` — database connection
+- `controllers/` — auth, threads
+- `middleware/` — auth, role check
+- `models/` — `User`, `Thread` (with embedded comments)
+- `routes/` — auth routes, thread routes
 
-You can keep your server entry point at `index.js` (per `package.json` main), and wire routes from `routes/`.
+## Setup
 
-## Installation
-
-1. Clone the repository
-2. Install dependencies
+1. Install deps
 
 ```powershell
 npm install
 ```
 
-3. Create a `.env` file at the project root. Example variables:
+2. Create `.env`
 
 ```env
 PORT=3000
-# DATABASE_URL=
-# JWT_SECRET=
+MONGO_URI=mongodb://127.0.0.1:27017/forum_api
+JWT_SECRET=your_secret
 ```
 
-## Usage
-
-1. Create an `index.js` at the project root (or update `main` in `package.json` to your preferred entry file).
-2. Export your routes from `routes/` and mount them in the server entry.
-3. Add helpful scripts to `package.json` (optional):
-
-```json
-{
-  "scripts": {
-    "dev": "node index.js",
-    "start": "node index.js"
-  }
-}
-```
-
-Run the app:
+3. Run
 
 ```powershell
 npm run dev
 ```
 
-## Technologies Used
+## API
 
-- Node.js
-- npm
+Base URL: `/api`
 
-## Author
+Auth
+- POST `/auth/signup` — create user { name, email, password }
+- POST `/auth/login` — login { email, password } → { token }
 
-Ikechukwu Okwuchukwu Amaechina
+Threads
+- POST `/threads` (auth)
+- GET `/threads`
+- GET `/threads/:id`
+- DELETE `/threads/:id` (admin)
+- POST `/threads/:id/comments` (auth)
+- POST `/threads/comments/:id/reply` (auth)
+- POST `/threads/:id/vote` (auth) body: { vote: 'up'|'down'|'clear' }
+- POST `/comments/:id/vote` (auth) body: { vote: 'up'|'down'|'clear' }
+
+Admin
+- GET `/admin/threads` (admin)
+- DELETE `/admin/comments/:id` (admin)
+
+## Examples
+
+Signup
+
+Request
+```http
+POST /api/auth/signup
+Content-Type: application/json
+
+{ "name":"Ana", "email":"ana@example.com", "password":"pass" }
+```
+
+Response 201
+```json
+{ "token":"<jwt>", "id":"...", "name":"Ana", "email":"ana@example.com" }
+```
+
+Create thread
+
+```http
+POST /api/threads
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{ "title":"Hello", "body":"World" }
+```
+
+Vote thread
+
+```http
+POST /api/threads/[:id]/vote
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{ "vote":"up" }
+```
+
+Admin delete comment
+
+```http
+DELETE /api/threads/admin/comments/[:commentId]
+Authorization: Bearer <admin_jwt>
+```
+
+## Notes
+
+- Votes are tracked by user id. Upvoting removes a previous downvote and vice‑versa. `clear` removes your vote.
+- Comments are embedded in a thread; replies reference parent by id.
+
+## Testing
+
+Run tests (if present):
+
+```powershell
+npm test
+```
+
+## License
+
+MIT

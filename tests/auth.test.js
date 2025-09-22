@@ -1,18 +1,14 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 let app;
 
 describe('Auth', () => {
-  let mongod;
   beforeAll(async () => {
-    mongod = await MongoMemoryServer.create();
-    process.env.MONGO_URI = mongod.getUri();
+    // MONGO_URI is set by globalSetup before tests run
     app = require('../index');
   });
   afterAll(async () => {
     await mongoose.disconnect();
-    await mongod.stop();
   });
 
   test('signup and login', async () => {

@@ -1,15 +1,13 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 let app;
 
 jest.setTimeout(30000);
 
 describe('Threads and comments', () => {
-  let mongod, token, userId;
+  let token, userId;
   beforeAll(async () => {
-    mongod = await MongoMemoryServer.create();
-    process.env.MONGO_URI = mongod.getUri();
+    // MONGO_URI is set by globalSetup
     app = require('../index');
     await request(app).post('/auth/signup').send({ name: 'u', email: 'u@u.com', password: 'p' });
     const login = await request(app).post('/auth/login').send({ email: 'u@u.com', password: 'p' });
@@ -17,7 +15,6 @@ describe('Threads and comments', () => {
   });
   afterAll(async () => {
     await mongoose.disconnect();
-    if (mongod && mongod.stop) await mongod.stop();
   });
 
   test('create thread, add comment, reply and view nested', async () => {
